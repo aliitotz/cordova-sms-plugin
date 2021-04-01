@@ -11,6 +11,9 @@
 
     <platform name="android">
         <config-file parent="/*" target="res/xml/config.xml">
+            <uses-feature android:name="android.hardware.telephony" android:required="false" />
+            <uses-permission android:name="android.permission.WRITE_SMS" />
+            <uses-permission android:name="android.permission.SEND_SMS" />
             <feature name="Sms">
                 <param name="android-package" value="com.jsmobile.plugins.sms.Sms" />
             </feature>
