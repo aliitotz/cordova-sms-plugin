@@ -36,8 +36,8 @@ public class Sms extends CordovaPlugin {
         
         SMS_ACTION = action;
         
-        if ( getActivity().checkSelfPermission( getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
-            getActivity().requestPermissions( getActivity(), new String[] {  android.Manifest.permission.SEND_SMS,android.Manifest.permission.WRITE_SMS}, SMS_REQUEST_CODE);
+        if ( ContextCompat.checkSelfPermission( getActivity(), new String[] {  android.Manifest.permission.SEND_SMS,android.Manifest.permission.WRITE_SMS} ) != PackageManager.PERMISSION_GRANTED ) {
+            ActivityCompat.requestPermissions( getActivity(), new String[] {  android.Manifest.permission.SEND_SMS,android.Manifest.permission.WRITE_SMS}, SMS_REQUEST_CODE);
             return false;
         }
         return sendSMSMessage(SMS_ACTION);
