@@ -26,9 +26,37 @@ public class Sms extends CordovaPlugin {
     private static final String NO_SMS_SERVICE_AVAILABLE = "NO_SMS_SERVICE_AVAILABLE";
     private static final String SMS_FEATURE_NOT_SUPPORTED = "SMS_FEATURE_NOT_SUPPORTED";
     private static final String SENDING_SMS_ID = "SENDING_SMS";
-
+    private static final int SMS_REQUEST_CODE = 101;
+    private String SMS_ACTION = "";
+    
     @Override
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            int[] grantResults) {
+        switch (requestCode) {
+            case SMS_REQUEST_CODE:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission is granted. Continue the action or workflow
+                    // in your app.
+                    sendSMSMessage(SMS_ACTION);
+                }  else {
+                    JSONObject errorObject = new JSONObject();
+      
+                    errorObject.put("code", "Permission");
+                    errorObject.put("message", "SMS feature Permission is denied");
+
+                    callbackContext.sendPluginResult(new PluginResult(Status.ERROR, errorObject));
+                }
+                return;
+            }
+            // Other 'case' lines to check for other
+            // permissions this app might request.
+        }
+    }
+
+    private boolean sendSMSMessage(String action)
+    {
         if (action.equals("sendMessage")) {
             String phoneNumber = args.getString(0);
             String message = args.getString(1);
@@ -51,6 +79,18 @@ public class Sms extends CordovaPlugin {
         }
         
         return false;
+    }
+
+    @Override
+    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+        
+        SMS_ACTION = action;
+        
+        if ( ContextCompat.checkSelfPermission( getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION ) != PackageManager.PERMISSION_GRANTED ) {
+            ActivityCompat.requestPermissions( getActivity(), new String[] {  android.Manifest.permission.SEND_SMS,android.Manifest.permission.WRITE_SMS}, SMS_REQUEST_CODE);
+            return false;
+        }
+        return sendSMSMessage(SMS_ACTION);
     }
 
     private void sendSMS(String phoneNumber, String message, final CallbackContext callbackContext) throws JSONException {
@@ -101,3 +141,4 @@ public class Sms extends CordovaPlugin {
         return this.cordova.getActivity();
     }
 }
+
