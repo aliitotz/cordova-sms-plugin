@@ -29,57 +29,7 @@ public class Sms extends CordovaPlugin {
     private static final int SMS_REQUEST_CODE = 101;
     private String SMS_ACTION = "";
     
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            int[] grantResults) {
-        switch (requestCode) {
-            case SMS_REQUEST_CODE:
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 &&
-                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Permission is granted. Continue the action or workflow
-                    // in your app.
-                    sendSMSMessage(SMS_ACTION);
-                }  else {
-                    JSONObject errorObject = new JSONObject();
-      
-                    errorObject.put("code", "Permission");
-                    errorObject.put("message", "SMS feature Permission is denied");
-
-                    callbackContext.sendPluginResult(new PluginResult(Status.ERROR, errorObject));
-                }
-                return;
-            }
-            // Other 'case' lines to check for other
-            // permissions this app might request.
-        }
-    }
-
-    private boolean sendSMSMessage(String action)
-    {
-        if (action.equals("sendMessage")) {
-            String phoneNumber = args.getString(0);
-            String message = args.getString(1);
-            
-            boolean isSupported = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_TELEPHONY);
-            
-            if (! isSupported) {
-                JSONObject errorObject = new JSONObject();
-                
-                errorObject.put("code", SMS_FEATURE_NOT_SUPPORTED);
-                errorObject.put("message", "SMS feature is not supported on this device");
-                
-                callbackContext.sendPluginResult(new PluginResult(Status.ERROR, errorObject));
-                return false;
-            }
-            
-            this.sendSMS(phoneNumber, message, callbackContext);
-            
-            return true;
-        }
-        
-        return false;
-    }
+    
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
@@ -135,6 +85,57 @@ public class Sms extends CordovaPlugin {
         SmsManager sms = SmsManager.getDefault();
         
         sms.sendTextMessage(phoneNumber, null, message, sentPI, null);
+    }
+    
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            int[] grantResults) {
+        switch (requestCode) {
+            case SMS_REQUEST_CODE:
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission is granted. Continue the action or workflow
+                    // in your app.
+                    sendSMSMessage(SMS_ACTION);
+                }  else {
+                    JSONObject errorObject = new JSONObject();
+      
+                    errorObject.put("code", "Permission");
+                    errorObject.put("message", "SMS feature Permission is denied");
+
+                    callbackContext.sendPluginResult(new PluginResult(Status.ERROR, errorObject));
+                }
+                return;
+            }
+            // Other 'case' lines to check for other
+            // permissions this app might request.
+        }
+    }
+
+    private boolean sendSMSMessage(String action){
+        if (action.equals("sendMessage")) {
+            String phoneNumber = args.getString(0);
+            String message = args.getString(1);
+            
+            boolean isSupported = getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_TELEPHONY);
+            
+            if (! isSupported) {
+                JSONObject errorObject = new JSONObject();
+                
+                errorObject.put("code", SMS_FEATURE_NOT_SUPPORTED);
+                errorObject.put("message", "SMS feature is not supported on this device");
+                
+                callbackContext.sendPluginResult(new PluginResult(Status.ERROR, errorObject));
+                return false;
+            }
+            
+            this.sendSMS(phoneNumber, message, callbackContext);
+            
+            return true;
+        }
+        
+        return false;
     }
     
     private Activity getActivity() {
