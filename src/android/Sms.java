@@ -88,10 +88,9 @@ public class Sms extends CordovaPlugin {
     }
     
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            int[] grantResults) {
-        switch (requestCode) {
-            case SMS_REQUEST_CODE:
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,int[] grantResults) {
+        
+        if(requestCode = SMS_REQUEST_CODE) {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 &&
                         grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -107,10 +106,10 @@ public class Sms extends CordovaPlugin {
                     callbackContext.sendPluginResult(new PluginResult(Status.ERROR, errorObject));
                 }
                 return;
-            }
+        }
             // Other 'case' lines to check for other
             // permissions this app might request.
-        }
+        
     }
 
     private boolean sendSMSMessage(String action){
